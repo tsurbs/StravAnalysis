@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 import matplotlib.pyplot as plt
 
-tree = ET.parse('test_run.tcx')
+tree = ET.parse('The_Data/test_run.tcx')
 root = tree.getroot()
 def expandToDepthD(root, d, showDepth = False, showTag = False, showText = True):
     return [] if d == 0 else [[] + [d] if showDepth else [] + [child.tag] if showTag else [] + [child.text] if showText else []  + expandToDepthD(child, d-1) for child in root]
@@ -47,16 +47,26 @@ def getXY(tree):
     Ys = np.array(list(map(lambda xy: float(xy[1][0]), xyPairs)))
     return (Xs, Ys)
 
-def getFeature(feature, tree):
+def getFeature(feature, tree, asColor = True):
     root = tree.getroot()
     l = list(map(lambda E: float(E.text), getAllTagsDFS(feature, root)))
     Fs = np.array(l)
     return Fs
+
 cmap = plt.get_cmap('spring', 100)
 def plotARun(tree, focusFeature = None):
     Xs, Ys = getXY(tree)
-    Fs = getFeature(focusFeature, tree)
-    plt.plot(Xs, Ys)
+    Zs = getFeature("}AltitudeMeters", tree, asColor=False)
+    colors = getFeature(focusFeature, tree, asColor=True)
+    _min = min(np.shape(Xs)[0], np.shape(Ys)[0], np.shape(Zs)[0], np.shape(colors)[0])
+    Xs = Xs[:_min]
+    Ys = Ys[:_min]
+    Zs = Zs[:_min]
+    colors = colors[:_min]
+    print(np.shape(colors))
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+    ax.scatter(Xs, Ys, Zs, c = colors)
     plt.show()
 
 
