@@ -13,3 +13,13 @@ This is a project where I'm just playing around with the data from my strava run
  - [ ] Create routes to maximize sentiment
  - [ ] Generate good routes in a place with no data
  - [ ] Generate commentary given run data
+
+## API Side: EsoLang
+curl -X POST https://www.strava.com/oauth/token \
+	-F client_id=$CLIENT_ID\
+	-F client_secret=$AUTHSECRET \
+	-F code=$AUTHCODE \
+	-F grant_type=authorization_code
+
+curl --location 'https://www.strava.com/api/v3/athlete/activities' \
+ --header 'Authorization: Bearer $BEARER_ACCESS'

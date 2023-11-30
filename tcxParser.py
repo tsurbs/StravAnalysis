@@ -1,9 +1,10 @@
 import xml.etree.ElementTree as ET
 import numpy as np
 import matplotlib.pyplot as plt
-
-tree = ET.parse('The_Data/test_run.tcx')
-root = tree.getroot()
+import os 
+from sklearn.cluster import KMeans
+# tree = ET.parse('The_Data/abc.tcx')
+# root = tree.getroot()
 def expandToDepthD(root, d, showDepth = False, showTag = False, showText = True):
     return [] if d == 0 else [[] + [d] if showDepth else [] + [child.tag] if showTag else [] + [child.text] if showText else []  + expandToDepthD(child, d-1) for child in root]
 # print(expandToDepthD(root[0][0][1], 1))
@@ -53,7 +54,13 @@ def getFeature(feature, tree, asColor = True):
     Fs = np.array(l)
     return Fs
 
-cmap = plt.get_cmap('spring', 100)
+def ezPlot(Xs, Ys, Zs, colors = None, threeD = False):
+    if colors is None: colors = np.zeros(len(Xs))
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d') if threeD else fig.add_subplot()
+    ax.scatter(Xs, Ys, Zs, c = colors) if threeD else ax.scatter(Xs, Ys, c = colors)
+    plt.show()
+
 def plotARun(tree, focusFeature = None):
     Xs, Ys = getXY(tree)
     Zs = getFeature("}AltitudeMeters", tree, asColor=False)
@@ -63,11 +70,72 @@ def plotARun(tree, focusFeature = None):
     Ys = Ys[:_min]
     Zs = Zs[:_min]
     colors = colors[:_min]
-    print(np.shape(colors))
+    return (Xs, Ys, Zs, colors)
+
+
+(Xs, Ys, Zs, Cs) = plotARun(ET.parse('The_Data/5717539530.tcx') , "}Speed")
+ezPlot(Xs, Ys, Zs, Cs, threeD=True)
+
+def detectCurves(tree, resolution = 5):
+    def slope(x1, y1, x2, y2):
+        if x1 == x2: return 0
+        elif x1>x2:
+            return (y1-y2)/(x1-x2)
+        return (y2-y1)/(x2-x1)
+    def stDev(list):
+        mean = sum(list) / len(list) 
+        variance = sum([((x - mean) ** 2) for x in list]) / len(list) 
+        return variance ** 0.5
+
+    Xs, Ys = getXY(tree)
+    Zs = getFeature("}AltitudeMeters", tree, asColor=False)
+    curvinessAsFeature = np.zeros(len(Xs))
+    for i in range((resolution//4), len(Xs)-(resolution//4)):
+        slopeAdd = stDev([slope(Xs[i], Ys[i], Xs[i+j], Ys[i+j]) for j in range(-resolution//2, (resolution)//2-1)])
+        print([slope(Xs[i], Ys[i], Xs[i+j], Ys[i+j]) for j in range(-resolution//2, (resolution)//2-1)])
+        curvinessAsFeature[i] += slopeAdd
+    print(curvinessAsFeature)
     fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
-    ax.scatter(Xs, Ys, Zs, c = colors)
+    ax = fig.add_subplot()
+    ax.scatter(Xs, Ys, c = curvinessAsFeature)
     plt.show()
+# detectCurves(tree, 9)
+
+def isRunIn(tree, xMin, yMin, xMax, yMax):
+    root = tree.getroot()
+    node = getFirstTagDFS("Position", root)
+    if node is None: return False
+    firstXY = expandToDepthD(node, 1)
+    return xMin < float(firstXY[0][0]) < xMax and yMin < float(firstXY[1][0]) < yMax
 
 
-plotARun(tree, "}Speed")
+def getAllRunData():
+    allFiles = os.listdir("./The_Data")
+    allXs = np.empty(0)
+    allYs = np.empty(0)
+    allZs = np.empty(0)
+    allCs = np.empty(0)
+    for f in allFiles:
+        try: 
+            tree = ET.parse('The_Data/'+f) 
+        except ET.ParseError: pass
+
+        if isRunIn(tree, 40.67,-75.32,40.68,-75.31): 
+            (Xs, Ys, Zs, colors) = plotARun(tree, "}Speed")
+            allXs = np.concatenate([allXs, Xs])
+            allYs = np.concatenate([allYs, Ys])
+            allZs = np.concatenate([allZs, Zs])
+            allCs = np.concatenate([allCs, colors])
+    return (allXs, allYs, allZs, allCs)
+
+def pltKMeansN(n):
+    (Xs, Ys, Zs, Cs) = getAllRunData()
+
+    data = np.column_stack((Xs, Ys)) #zip but numpy
+    print(data[0:100])
+    kmeans = KMeans(n_clusters=n)
+    kmeans.fit(data)
+    labels = kmeans.labels_
+
+    plt.scatter(Xs, Ys, c = labels)
+    plt.show()
