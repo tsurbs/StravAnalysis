@@ -9,7 +9,7 @@ headers = {
 
 activity_response = requests.get('https://www.strava.com/api/v3/athlete/activities', headers=headers)
 most_recent_activity = activity_response.json()[0]
-
+print(most_recent_activity)
 id = most_recent_activity['id']
 
 # to get laps of most recent activity, replace "10273930982" with '+id+'
@@ -45,4 +45,4 @@ data = {
     "id":id,
     "data":update_json
 }
-update_response = requests.put('https://www.strava.com/api/v3/activities/'+str(id), data=update_json, headers=headers)
+# update_response = requests.put('https://www.strava.com/api/v3/activities/'+str(id), data=update_json, headers=headers)
