@@ -1,0 +1,3 @@
+[submodule "SpeedScript"]
+	path = SpeedScript
+	url = https://github.com/tsurbs/SpeedScript.git
