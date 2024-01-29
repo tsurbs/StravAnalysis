@@ -101,7 +101,9 @@ def detectCurves(tree, resolution = 5):
     plt.show()
 # detectCurves(tree, 9)
 
-def isRunIn(tree, xMin, yMin, xMax, yMax):
+def isRunIn(tree, x1, y1, x2, y2):
+    xMin, xMax = (min(x1, x2), max(x1, x2))
+    yMin, yMax = (min(y1, y2), max(y1, y2))
     root = tree.getroot()
     node = getFirstTagDFS("Position", root)
     if node is None: return False
@@ -125,7 +127,7 @@ def getAllRunData():
             tree = ET.parse('./Raw_Strava_Data/activities/'+f) 
         except ET.ParseError: pass
 
-        if isRunIn(tree, 40.67,-75.32,40.68,-75.31): 
+        if isRunIn(tree,40.376922439181726, -79.82669782619318, 40.48980414288396, -79.9924162455036): 
             (Xs, Ys, Zs, colors) = plotARun(tree, "}Speed")
             allXs = np.concatenate([allXs, Xs])
             allYs = np.concatenate([allYs, Ys])

@@ -4,3 +4,4 @@ Raw_Strava_Data/*
 Raw_Strava_Data _Backup
 __pycache__
 SpeedScript
+*.pkl
