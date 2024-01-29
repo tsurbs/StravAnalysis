@@ -1,36 +1,11 @@
-from apiParser import getActivityData, updateActivityData, getRecentActivityID
+from apiParser import getActivityData, updateActivityData, getRecentActivityID, loadTrainingData
 from tcxParser import getAllActivityIDs
 from json import load
 import pickle as pkl
-import os
 import math
-import nltk
+from sys import argv
 
-data = []
-
-if os.path.getsize("TitleTypeDesc.pkl") > 10:
-    with open("TitleTypeDesc.pkl", "rb") as file:
-        data = pkl.load(file)
-else:
-    activityNums = getAllActivityIDs()[-150:]
-    print(activityNums)
-    def getTitleTypeDesc(id):
-        activity:dict = getActivityData(id)
-
-        if "workout_type" not in activity.keys(): 
-            print("Fail")
-            return None
-
-        return (activity["name"], activity["workout_type"], activity["description"])
-
-    TitleTypeDesc = [getActivityData(id) for id in activityNums]
-
-    filtered = [t for t in TitleTypeDesc if t is not None]
-
-    with open("TitleTypeDesc.pkl", "wb") as file:
-        pkl.dump(filtered, file)
-
-    data = filtered
+data = loadTrainingData()
 
 def NoneToQuot(s):
     if s is None:
@@ -80,16 +55,17 @@ cv = CountVectorizer()
 cv.fit(data)
 X_train_cv = cv.fit_transform(data)
 
-# from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression
 
-# lr = LogisticRegression(multi_class="multinomial")
-# lr.fit(X_train_cv, labels)
-
-from sklearn.tree import DecisionTreeClassifier
-
-lr = DecisionTreeClassifier()
+lr = LogisticRegression(multi_class="multinomial", penalty="l2")
 lr.fit(X_train_cv, labels)
 
+# from sklearn.tree import DecisionTreeClassifier
+
+# lr = DecisionTreeClassifier()
+# lr.max_leaf_nodes = 16
+# lr.fit(X_train_cv, labels)
+# print(lr.get_n_leaves())
 # from sklearn.neural_network import MLPClassifier
 
 # lr = MLPClassifier(max_iter=500)
@@ -97,7 +73,7 @@ lr.fit(X_train_cv, labels)
 
 # This would be different w/ a split.  I dont't have much data so we just run it on X_train cv
 predictions = lr.predict(X_train_cv)
-print(lr.get_depth)
+# print(lr.get_depth)
 from sklearn import metrics
 
 a = metrics.confusion_matrix(labels,[round(p, 0) for p in predictions])
@@ -106,9 +82,11 @@ for i in range(len(labels)):
         print(labels[i], predictions[i], data[i])
 print(a)
 
-recentId = getRecentActivityID()
+recentId = getRecentActivityID(int(argv[1]) if len(argv) > 0 else 0)
+print(recentId)
 recent = getActivityData(recentId)
 datum = titleTypeDescIfy(recent)[1]
+print(cleanOneTitleDesc(datum))
 
 a = lr.predict(cv.transform([cleanOneTitleDesc(datum)]))
 print(a[0])

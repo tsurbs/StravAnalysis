@@ -1,7 +1,9 @@
 import os
 import requests
 import datetime
-import json
+import pickle as pkl
+from tcxParser import getAllActivityIDs
+
 def getAccessToken():
     if os.getenv("BEARERACCESS") is not None and datetime.datetime.now(datetime.timezone.utc).timestamp()+10 < int(os.getenv("access_exp_at")):
         return os.getenv("BEARERACCESS")
@@ -25,7 +27,6 @@ def getActivityData(activityId):
     headers = {
         'Authorization': 'Bearer ' + btoken
     }
-    print(headers, 'https://www.strava.com/api/v3/activities/'+str(activityId))
     activity_response = requests.get('https://www.strava.com/api/v3/activities/'+str(activityId), headers=headers)
     return activity_response.json()
 
@@ -46,6 +47,32 @@ def getRecentActivityID(n_back = 0):
         'Authorization': 'Bearer ' + btoken
     }
     activity_response = requests.get('https://www.strava.com/api/v3/athlete/activities', headers=headers)
+
     most_recent_activity = activity_response.json()[n_back]
 
     return most_recent_activity['id']
+
+def getRecentActivityIDs():
+    btoken = getAccessToken()
+    headers = {
+        'Authorization': 'Bearer ' + btoken
+    }
+    activity_response = requests.get('https://www.strava.com/api/v3/athlete/activities/', headers=headers)
+
+    return [x['id'] for x in activity_response.json()]
+
+def loadTrainingData():
+    if os.path.exists("ActivityDataList.pkl"):
+        with open("ActivityDataList.pkl", "rb") as file:
+            return pkl.load(file)
+    else:
+        activityNums = getAllActivityIDs()[-150:] + getRecentActivityIDs()
+
+        ActivityDataList = [getActivityData(id) for id in activityNums]
+
+        filtered = [t for t in ActivityDataList if t is not None]
+
+        with open("ActivityDataList.pkl", "wb") as file:
+            pkl.dump(filtered, file)
+
+        return filtered

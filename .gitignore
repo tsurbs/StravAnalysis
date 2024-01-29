@@ -1,6 +1,7 @@
 .secrets
 Data/*
 Raw_Strava_Data/*
-Raw_Strava_Data _Backup
+Raw_Strava_Data_Backup/*
 __pycache__
 SpeedScript
+*.pkl
