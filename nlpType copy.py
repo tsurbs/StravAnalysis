@@ -55,18 +55,18 @@ cv = CountVectorizer()
 cv.fit(data)
 X_train_cv = cv.fit_transform(data)
 
-from sklearn.linear_model import LogisticRegression
+# from sklearn.linear_model import LogisticRegression
 
-lr = LogisticRegression(multi_class="multinomial", penalty="l2")
-lr.fit(X_train_cv, labels)
-
-# from sklearn.tree import DecisionTreeClassifier
-
-# lr = DecisionTreeClassifier()
-# lr.max_leaf_nodes = 16
+# lr = LogisticRegression(multi_class="multinomial", penalty="l2")
 # lr.fit(X_train_cv, labels)
-# print(lr.get_n_leaves())
-# from sklearn.neural_network import MLPClassifier
+
+from sklearn.tree import DecisionTreeClassifier
+
+lr = DecisionTreeClassifier()
+lr.max_leaf_nodes = 16
+lr.fit(X_train_cv, labels)
+print(lr.get_n_leaves())
+from sklearn.neural_network import MLPClassifier
 
 # lr = MLPClassifier(max_iter=500)
 # lr.fit(X_train_cv, labels)

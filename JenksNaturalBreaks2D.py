@@ -26,7 +26,7 @@ class JenksNaturalBreaks2D:
         self.label_centers = np.array([tuple([random.uniform(bounds[1][0], bounds[0][0]), random.uniform(bounds[1][1], bounds[0][1])]) for x in range(self.n_clusters)])
         self.point_labels = [self.getClosestCenter(p) for p in range(len(self.data))]
         
-        while (self.iter_number < 5):
+        while (self.iter_number < 20):
 
             for i in range(1):
                 self.oneMeansMove()
@@ -117,9 +117,9 @@ class JenksNaturalBreaks2D:
         meansCenteredGtrNormd = [(mc[0]/meansCenteredGtrAvg, mc[1]) for mc in meansCenteredGtr if mc[0] > meanOfMeans]
         self.center_gradients = np.zeros(self.n_clusters)
         for m, i in meansCenteredGtrNormd:
-            self.center_gradients[i] = m 
+            self.center_gradients[i] = m/2 
         for m, i in meansCenteredLtNormd:
-            self.center_gradients[i] = m 
+            self.center_gradients[i] = m/2
             
 
     def euclideanDistanceSq(self, p1, p2):

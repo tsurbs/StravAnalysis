@@ -1,15 +1,12 @@
-from apiParser import loadTrainingData
+from apiParser import loadDisc
 import matplotlib.pyplot as plt
 import torch
-import polyline as pl
 import pickle as pkl
 from math import floor
-data = loadTrainingData()
-filtered = list(filter(lambda x: "map" in x and "polyline" in x["map"] and len(x["map"]["polyline"]) != 0, data))
+data = loadDiscMaps()
 
 def polylineToTensor(s, length):
-    x = [float(ord(c)/255) for c in s]
-    x += [0 for c in range(length - len(x))]
+    x = [float(c/255) for c in s]
     return torch.tensor(x)
 
 X = [polylineToTensor(x["map"]["polyline"], 2630) for x in filtered]
@@ -17,7 +14,7 @@ print(len(X))
 
 # Creating a PyTorch class(From G2G)
 # 28*28 ==> 9 ==> 28*28
-class AE(torch.nn.Module):
+class SeqModel(torch.nn.Module):
     def __init__(self):
         super().__init__()
          
@@ -25,7 +22,7 @@ class AE(torch.nn.Module):
         # layer followed by Relu activation function
         # 784 ==> 9
         self.encoder = torch.nn.Sequential(
-            torch.nn.Linear(2630, 2048),
+            torch.nn.Linear(2, 2048),
             torch.nn.ReLU(),
             torch.nn.Linear(2048, 1024),
             torch.nn.ReLU(),

@@ -54,7 +54,7 @@ def getFeature(feature, tree, asColor = True):
     Fs = np.array(l)
     return Fs
 
-def ezPlot(Xs, Ys, Zs, colors = None, threeD = False):
+def ezPlot(Xs, Ys, Zs = None, colors = None, threeD = False):
     if colors is None: colors = np.zeros(len(Xs))
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d') if threeD else fig.add_subplot()
@@ -74,7 +74,7 @@ def plotARun(tree, focusFeature = None):
 
 
 # (Xs, Ys, Zs, Cs) = plotARun(ET.parse('The_Data/5717539530.tcx') , "}Speed")
-# ezPlot(Xs, Ys, Zs, Cs, threeD=True)
+
 
 def detectCurves(tree, resolution = 5):
     def slope(x1, y1, x2, y2):
@@ -127,11 +127,14 @@ def getAllRunData():
             tree = ET.parse('./Raw_Strava_Data/activities/'+f) 
         except ET.ParseError: pass
 
+    #40.43798619868844, -79.97414138202551, 40.48980414288396, -79.9924162455036
+
         if isRunIn(tree,40.376922439181726, -79.82669782619318, 40.48980414288396, -79.9924162455036): 
             (Xs, Ys, Zs, colors) = plotARun(tree, "}Speed")
             allXs = np.concatenate([allXs, Xs])
             allYs = np.concatenate([allYs, Ys])
             allZs = np.concatenate([allZs, Zs])
             allCs = np.concatenate([allCs, colors])
+    # ezPlot(allXs, allYs, allZs, allZs, threeD=False)
     return (allXs, allYs, allZs, allCs)
 

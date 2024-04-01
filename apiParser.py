@@ -62,17 +62,19 @@ def getRecentActivityIDs():
     return [x['id'] for x in activity_response.json()]
 
 def loadTrainingData():
-    if os.path.exists("ActivityDataList.pkl"):
-        with open("ActivityDataList.pkl", "rb") as file:
-            return pkl.load(file)
+    if False:# if os.path.exists("ActivityDataList.pkl"):
+    #     with open("ActivityDataList.pkl", "rb") as file:
+    #         return pkl.load(file)
+        pass
     else:
-        activityNums = getAllActivityIDs()[-150:] + getRecentActivityIDs()
+        activityNums = getAllActivityIDs()[-300:-150]
 
         ActivityDataList = [getActivityData(id) for id in activityNums]
 
         filtered = [t for t in ActivityDataList if t is not None]
-
+        with open("ActivityDataList.pkl", "rb") as file:
+            data = pkl.load(file)
         with open("ActivityDataList.pkl", "wb") as file:
-            pkl.dump(filtered, file)
+            pkl.dump(data + filtered, file)
 
-        return filtered
+        # return filtered
