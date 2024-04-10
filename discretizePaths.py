@@ -55,6 +55,6 @@ for i in range(len(mapped)):
             clusterXs = [a[0] for a in clusters.cluster_centers_]
             clusterYs = [a[1] for a in clusters.cluster_centers_]
 
-            plt.scatter(clusterXs, clusterYs, )
-            plt.scatter(Xs, Ys, c="r")
-            plt.show()
+            # plt.scatter(clusterXs, clusterYs, )
+            plt.scatter(Xs, Ys, c=plt.cm.get_cmap("hsv", len(mapped))(i))
+plt.show()
