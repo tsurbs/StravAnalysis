@@ -1,0 +1,14 @@
+LICENSE
+README.md
+pyproject.toml
+src/JenksNaturalBreaks2D.py
+src/apiParser.py
+src/argvtst.py
+src/clustering.py
+src/dataCleaning.py
+src/discretizePaths.py
+src/tcxParser.py
+src/example_package_tsurbs.egg-info/PKG-INFO
+src/example_package_tsurbs.egg-info/SOURCES.txt
+src/example_package_tsurbs.egg-info/dependency_links.txt
+src/example_package_tsurbs.egg-info/top_level.txt

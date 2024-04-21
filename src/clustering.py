@@ -46,7 +46,7 @@ def jnbN(n, resolution):
     with open("allRunData.pkl", "rb") as file:
         (Xs, Ys, Zs, Cs) = pkl.load(file)
 
-    print("data load")
+    print("data load, ", len(Xs), len(Ys), len(Zs), len(Cs))
     Xs, Ys = dedensify(Xs, Ys, Zs, Cs, resolution = resolution)
     print(Xs, Ys, len(Xs), "data clean")
     data = np.column_stack((Ys, Xs)) #zip but numpy
@@ -72,6 +72,6 @@ def jnbN(n, resolution):
         plt.show()
     return jenks
 
-clusters = kMeansN(300, 3)
+clusters = jnbN(300, 3)
 with open("clusters.pkl", "wb") as file:
     pkl.dump(clusters, file)
